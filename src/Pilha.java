@@ -53,8 +53,24 @@ public class Pilha<E> {
 	 * @throws IllegalArgumentException se a pilha não contém numItens elementos.
 	 */
 	public Pilha<E> subPilha(int numItens) {
-		
-		// TODO
-		return null;
+    if (numItens < 0) {
+        throw new IllegalArgumentException("numItens não pode ser negativo.");
+    }
+
+    if (numItens == 0) {
+        return new Pilha<>();
+    }
+
+    if (vazia()) {
+        throw new IllegalArgumentException(
+            "A pilha possui menos de " + numItens + " elementos.");
+    }
+
+    E item = this.desempilhar();
+    Pilha<E> resultado = this.subPilha(numItens - 1);
+    this.empilhar(item);
+    resultado.empilhar(item);
+
+		return resultado;
 	}
 }

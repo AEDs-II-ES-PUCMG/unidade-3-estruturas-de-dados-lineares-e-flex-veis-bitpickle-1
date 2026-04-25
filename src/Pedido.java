@@ -39,6 +39,17 @@ public class Pedido implements Comparable<Pedido>{
 		this.dataPedido = dataPedido;
 		this.formaDePagamento = formaDePagamento;
 	}
+
+	private Pedido(int id, LocalDate dataPedido, int formaDePagamento) {
+		this.idPedido = id;
+		this.produtos = new Produto[MAX_PRODUTOS];
+		this.quantProdutos = 0;
+		this.dataPedido = dataPedido;
+		this.formaDePagamento = formaDePagamento;
+		if (id >= ultimoID) {
+			ultimoID = id + 1;
+		}
+	}
 	
 	/**
      * Inclui um produto neste pedido e aumenta a quantidade de produtos armazenados no pedido até o momento.
@@ -143,7 +154,41 @@ public class Pedido implements Comparable<Pedido>{
     		return 1;
     	}
     }
-    
+
+    public String gerarDadosTexto() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        StringBuilder sb = new StringBuilder();
+        sb.append(idPedido).append(";")
+          .append(fmt.format(dataPedido)).append(";")
+          .append(formaDePagamento).append(";")
+          .append(quantProdutos);
+        for (int i = 0; i < quantProdutos; i++) {
+            sb.append(";").append(produtos[i].hashCode());
+        }
+        return sb.toString();
+    }
+
+    static Pedido criarDoTexto(String linha, Produto[] produtosCadastrados, int quantosProdutos) {
+        String[] parts = linha.split(";");
+        int id = Integer.parseInt(parts[0]);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate data = LocalDate.parse(parts[1], fmt);
+        int formaPagamento = Integer.parseInt(parts[2]);
+        int numProdutos = Integer.parseInt(parts[3]);
+
+        Pedido pedido = new Pedido(id, data, formaPagamento);
+        for (int i = 0; i < numProdutos; i++) {
+            int prodId = Integer.parseInt(parts[4 + i]);
+            for (int j = 0; j < quantosProdutos; j++) {
+                if (produtosCadastrados[j].hashCode() == prodId) {
+                    pedido.incluirProduto(produtosCadastrados[j]);
+                    break;
+                }
+            }
+        }
+        return pedido;
+    }
+
     public LocalDate getDataPedido() {
     	return dataPedido;
     }
