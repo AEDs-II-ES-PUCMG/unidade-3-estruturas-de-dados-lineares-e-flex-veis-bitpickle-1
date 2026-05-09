@@ -2,7 +2,9 @@ import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 
 public class App {
@@ -19,8 +21,8 @@ public class App {
     /** Quantidade de produtos cadastrados atualmente no vetor */
     static int quantosProdutos = 0;
 
-    /** Pilha de pedidos */
-    static Pilha<Pedido> pilhaPedidos = new Pilha<>();
+    /** Fila de pedidos finalizados que aguardam processamento */
+    static Fila<Pedido> filaPedidos = new Fila<>();
         
     static void limparTela() {
         System.out.print("\033[H\033[2J");
@@ -203,12 +205,31 @@ public class App {
     }
     
     /**
-     * Finaliza um pedido, momento no qual ele deve ser armazenado em uma pilha de pedidos.
+     * Finaliza um pedido, momento no qual ele deve ser armazenado em uma fila de pedidos.
      * @param pedido O pedido que deve ser finalizado.
      */
     public static void finalizarPedido(Pedido pedido) {
     	
-    	// TODO
+    	if (pedido == null) {
+    		System.out.println("Nenhum pedido foi iniciado para finalização.");
+    	} else {
+    		filaPedidos.enfileirar(pedido);
+    		System.out.println("Pedido finalizado e inserido na fila de processamento.");
+    		System.out.println(pedido);
+    	}
+    }
+    
+    /**
+     * Salva os pedidos finalizados em um arquivo-texto.
+     * @param nomeArquivoPedidos Nome do arquivo em que os pedidos serão salvos.
+     */
+    public static void salvarPedidos(String nomeArquivoPedidos) {
+    	
+    	try (PrintWriter arquivo = new PrintWriter(new FileWriter(nomeArquivoPedidos, Charset.forName("UTF-8")))) {
+    		arquivo.print(filaPedidos.toString());
+    	} catch (IOException excecaoArquivo) {
+    		System.out.println("Não foi possível salvar os pedidos em arquivo.");
+    	}
     }
     
     public static void listarProdutosPedidosRecentes() {
@@ -234,12 +255,16 @@ public class App {
                 case 2 -> mostrarProduto(localizarProduto());
                 case 3 -> mostrarProduto(localizarProdutoDescricao());
                 case 4 -> pedido = iniciarPedido();
-                case 5 -> finalizarPedido(pedido);
+                case 5 -> {
+                	finalizarPedido(pedido);
+                	pedido = null;
+                }
                 case 6 -> listarProdutosPedidosRecentes();
             }
             pausa();
         }while(opcao != 0);       
 
+        salvarPedidos("pedidos.txt");
         teclado.close();    
     }
 }

@@ -59,4 +59,22 @@ public class Fila<E> {
 
 		return ocorrencias;
 	}
+
+	@Override
+	public String toString() {
+
+		StringBuilder dados = new StringBuilder();
+		Celula<E> atual = frente.getProximo();
+
+		while (atual != null) {
+			dados.append(atual.getItem());
+			if (atual.getProximo() != null) {
+				dados.append(System.lineSeparator());
+				dados.append(System.lineSeparator());
+			}
+			atual = atual.getProximo();
+		}
+
+		return dados.toString();
+	}
 }
