@@ -66,6 +66,7 @@ public class App {
         System.out.println("4 - Iniciar novo pedido");
         System.out.println("5 - Fechar pedido");
         System.out.println("6 - Listar produtos dos pedidos mais recentes");
+        System.out.println("7 - Extrair lote de pedidos para processamento");
         System.out.println("0 - Sair");
         System.out.print("Digite sua opção: ");
         return Integer.parseInt(teclado.nextLine());
@@ -237,6 +238,26 @@ public class App {
     	// TODO
     }
     
+    public static void extrairLotePedidos() {
+    	
+    	cabecalho();
+    	
+    	if (filaPedidos.vazia()) {
+    		System.out.println("Não há pedidos finalizados aguardando processamento.");
+    		return;
+    	}
+    	
+    	Integer numItens = lerOpcao("Quantos pedidos devem ser extraídos da fila?", Integer.class);
+    	if (numItens == null || numItens <= 0) {
+    		System.out.println("Quantidade inválida de pedidos.");
+    		return;
+    	}
+    	
+    	Fila<Pedido> lotePedidos = filaPedidos.extrairLote(numItens);
+    	System.out.println("Lote de pedidos extraído da fila:");
+    	System.out.println(lotePedidos);
+    }
+    
 	public static void main(String[] args) {
 		
 		teclado = new Scanner(System.in, Charset.forName("UTF-8"));
@@ -260,6 +281,7 @@ public class App {
                 	pedido = null;
                 }
                 case 6 -> listarProdutosPedidosRecentes();
+                case 7 -> extrairLotePedidos();
             }
             pausa();
         }while(opcao != 0);       

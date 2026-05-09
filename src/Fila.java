@@ -60,6 +60,17 @@ public class Fila<E> {
 		return ocorrencias;
 	}
 
+	public Fila<E> extrairLote(int numItens) {
+
+		Fila<E> lote = new Fila<E>();
+
+		for (int i = 0; i < numItens && !vazia(); i++) {
+			lote.enfileirar(desenfileirar());
+		}
+
+		return lote;
+	}
+
 	@Override
 	public String toString() {
 
